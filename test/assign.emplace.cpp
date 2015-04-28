@@ -18,6 +18,12 @@
 
 EGGS_CXX11_STATIC_CONSTEXPR std::size_t npos = eggs::variant<>::npos;
 
+struct Aggregate
+{
+    int x;
+    float y;
+};
+
 TEST_CASE("variant<Ts...>::emplace<I>(Args&&...)", "[variant.assign]")
 {
     SECTION("empty target")
@@ -47,6 +53,36 @@ TEST_CASE("variant<Ts...>::emplace<I>(Args&&...)", "[variant.assign]")
             constexpr int c = test::call();
         }
 #endif
+
+        SECTION("list-initialization")
+        {
+            eggs::variant<Aggregate, std::string> v;
+
+            REQUIRE(bool(v) == false);
+            REQUIRE(v.which() == npos);
+
+            v.emplace<0>(42);
+
+            CHECK(bool(v) == true);
+            CHECK(v.which() == 0u);
+            CHECK(v.target_type() == typeid(Aggregate));
+            REQUIRE(v.target<Aggregate>() != nullptr);
+            CHECK(v.target<Aggregate>()->x == 42);
+            CHECK(v.target<Aggregate>()->y == 0.f);
+
+#if EGGS_CXX14_HAS_CONSTEXPR
+            SECTION("constexpr")
+            {
+                struct test { static constexpr int call()
+                {
+                    eggs::variant<int, Aggregate> v;
+                    v.emplace<1>(42);
+                    return 0;
+                }};
+                constexpr int c = test::call();
+            }
+#endif
+        }
     }
 
     SECTION("same target")
@@ -298,6 +334,36 @@ TEST_CASE("variant<Ts...>::emplace<T>(Args&&...)", "[variant.assign]")
             constexpr int c = test::call();
         }
 #endif
+
+        SECTION("list-initialization")
+        {
+            eggs::variant<Aggregate, std::string> v;
+
+            REQUIRE(bool(v) == false);
+            REQUIRE(v.which() == npos);
+
+            v.emplace<Aggregate>(42);
+
+            CHECK(bool(v) == true);
+            CHECK(v.which() == 0u);
+            CHECK(v.target_type() == typeid(Aggregate));
+            REQUIRE(v.target<Aggregate>() != nullptr);
+            CHECK(v.target<Aggregate>()->x == 42);
+            CHECK(v.target<Aggregate>()->y == 0.f);
+
+#if EGGS_CXX14_HAS_CONSTEXPR
+            SECTION("constexpr")
+            {
+                struct test { static constexpr int call()
+                {
+                    eggs::variant<int, Aggregate> v;
+                    v.emplace<Aggregate>(42);
+                    return 0;
+                }};
+                constexpr int c = test::call();
+            }
+#endif
+        }
     }
 
     SECTION("same target")

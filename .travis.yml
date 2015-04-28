@@ -12,6 +12,7 @@ branches:
   only:
     - master
     - develop
+    - N4462
 
 # Install dependencies
 before_install:

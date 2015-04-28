@@ -16,6 +16,12 @@
 
 using eggs::variants::in_place;
 
+struct Aggregate
+{
+    int x;
+    float y;
+};
+
 TEST_CASE("variant<Ts...>::variant(in_place<I>, Args&&...)", "[variant.cnstr]")
 {
     eggs::variant<int, std::string> v(in_place<0>, 42);
@@ -46,6 +52,39 @@ TEST_CASE("variant<Ts...>::variant(in_place<I>, Args&&...)", "[variant.cnstr]")
 #  endif
     }
 #endif
+
+    SECTION("list-initialization")
+    {
+        eggs::variant<Aggregate, std::string> v(in_place<0>, 42);
+
+        CHECK(bool(v) == true);
+        CHECK(v.which() == 0u);
+        CHECK(v.target_type() == typeid(Aggregate));
+        REQUIRE(v.target<Aggregate>() != nullptr);
+        CHECK(v.target<Aggregate>()->x == 42);
+        CHECK(v.target<Aggregate>()->y == 0.f);
+
+#if EGGS_CXX11_HAS_CONSTEXPR
+        SECTION("constexpr")
+        {
+            constexpr eggs::variant<int, Aggregate> v(in_place<1>, 42);
+            constexpr bool vb = bool(v);
+            constexpr std::size_t vw = v.which();
+            constexpr bool vttb = v.target<Aggregate>()->x == 42;
+            constexpr std::type_info const& vtt = v.target_type();
+
+#  if EGGS_CXX14_HAS_CONSTEXPR
+            struct test { static constexpr int call()
+            {
+                eggs::variant<int, Aggregate> v(in_place<1>, 42);
+                v.target<Aggregate>()->x = 43;
+                return 0;
+            }};
+            constexpr int c = test::call();
+#  endif
+        }
+#endif
+    }
 }
 
 TEST_CASE("variant<T, T>::variant(in_place<I>, Args&&...)", "[variant.cnstr]")
@@ -132,6 +171,39 @@ TEST_CASE("variant<Ts...>::variant(in_place<T>, Args&&...)", "[variant.cnstr]")
 #  endif
     }
 #endif
+
+    SECTION("list-initialization")
+    {
+        eggs::variant<Aggregate, std::string> v(in_place<Aggregate>, 42);
+
+        CHECK(bool(v) == true);
+        CHECK(v.which() == 0u);
+        CHECK(v.target_type() == typeid(Aggregate));
+        REQUIRE(v.target<Aggregate>() != nullptr);
+        CHECK(v.target<Aggregate>()->x == 42);
+        CHECK(v.target<Aggregate>()->y == 0.f);
+
+#if EGGS_CXX11_HAS_CONSTEXPR
+        SECTION("constexpr")
+        {
+            constexpr eggs::variant<int, Aggregate> v(in_place<Aggregate>, 42);
+            constexpr bool vb = bool(v);
+            constexpr std::size_t vw = v.which();
+            constexpr bool vttb = v.target<Aggregate>()->x == 42;
+            constexpr std::type_info const& vtt = v.target_type();
+
+#  if EGGS_CXX14_HAS_CONSTEXPR
+            struct test { static constexpr int call()
+            {
+                eggs::variant<int, Aggregate> v(in_place<Aggregate>, 42);
+                v.target<Aggregate>()->x = 43;
+                return 0;
+            }};
+            constexpr int c = test::call();
+#  endif
+        }
+#endif
+    }
 }
 
 #if EGGS_CXX11_HAS_INITIALIZER_LIST_OVERLOADING
