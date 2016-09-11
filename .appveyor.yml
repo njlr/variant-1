@@ -17,6 +17,7 @@ branches:
   only:
     - master
     - develop
+    - explicit
 
 build_script:
   - mkdir build
