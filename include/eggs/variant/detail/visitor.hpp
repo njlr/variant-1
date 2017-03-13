@@ -259,7 +259,7 @@ namespace eggs { namespace variants { namespace detail
     EGGS_CXX11_CONSTEXPR typename std::enable_if<
         !_addressof::has_addressof_operator<T>::value
       , T*
-    >::type addressof(T& r) EGGS_CXX11_NOEXCEPT
+    >::type addressof(T& r) noexcept
     {
         return &r;
     }
@@ -268,7 +268,7 @@ namespace eggs { namespace variants { namespace detail
     typename std::enable_if<
         _addressof::has_addressof_operator<T>::value
       , T*
-    >::type addressof(T& r) EGGS_CXX11_NOEXCEPT
+    >::type addressof(T& r) noexcept
     {
         return std::addressof(r);
     }

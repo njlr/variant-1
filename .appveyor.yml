@@ -5,9 +5,18 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-os:
-  - Visual Studio 2013
-  - Visual Studio 2015
+version: 1.0.{build}
+
+environment:
+  global:
+    - platform: x64
+
+  matrix:
+    - image: Visual Studio 2015
+      GENERATOR: Visual Studio 14 2015
+
+    - image: Visual Studio 2017
+      GENERATOR: Visual Studio 15 2017
 
 configuration:
   - Debug
@@ -17,9 +26,11 @@ branches:
   only:
     - master
     - develop
+    - msvc
 
 build_script:
   - mkdir build
   - cd build
-  - cmake ..
+  - echo cmake -G "%GENERATOR%" -A Win64
+  - cmake -G "%GENERATOR%" -A Win64 ..
   - cmake --build . --config %CONFIG%

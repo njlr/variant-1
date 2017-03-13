@@ -17,14 +17,14 @@ namespace eggs { namespace variants { namespace detail
 {
     template <typename T>
     EGGS_CXX11_CONSTEXPR T&& forward(
-        typename std::remove_reference<T>::type& t) EGGS_CXX11_NOEXCEPT
+        typename std::remove_reference<T>::type& t) noexcept
     {
         return static_cast<T&&>(t);
     }
 
     template <typename T>
     EGGS_CXX11_CONSTEXPR T&& forward(
-        typename std::remove_reference<T>::type&& t) EGGS_CXX11_NOEXCEPT
+        typename std::remove_reference<T>::type&& t) noexcept
     {
         return static_cast<T&&>(t);
     }
@@ -32,7 +32,7 @@ namespace eggs { namespace variants { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     EGGS_CXX11_CONSTEXPR typename std::remove_reference<T>::type&& move(
-        T&& t) EGGS_CXX11_NOEXCEPT
+        T&& t) noexcept
     {
         return static_cast<typename std::remove_reference<T>::type&&>(t);
     }
